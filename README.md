@@ -37,6 +37,28 @@ knowledge.
    requires the LLM to cite its source or reply exactly `Not found`, preventing
    unsupported or hallucinated answers.
 
+```mermaid
+graph TD
+    A[User] -->|Types Question| B(Streamlit Web UI)
+    B -->|Passes Query| C{LangChain RAG Pipeline}
+    
+    subgraph Retrieval Phase
+    C -->|Embeds Query| D[(ChromaDB Vector Store)]
+    D -.->|Returns Top 4 Chunks| C
+    end
+    
+    subgraph Generation Phase
+    C -->|Passes Context + Query| E[Google Gemini LLM]
+    E -.->|Gatekeeper System Prompt| F{Answer Found?}
+    F -->|Yes| G[Return Exact Citation]
+    F -->|No / Subjective| H[Return 'Not found']
+    end
+    
+    G --> B
+    H --> B
+    B -->|Displays Output| A
+```
+
 ## 3. Setup & Installation
 
 Before running the project, place `History_2024-25.pdf` in the `data/`
