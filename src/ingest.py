@@ -1,8 +1,10 @@
+import os
+import shutil
 import sys
 from pathlib import Path
 from typing import List
+from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -53,6 +55,12 @@ def create_vector_store(
     persist_dir: Path,
     model_name: str = EMBEDDING_MODEL_NAME,
 ) -> Chroma:
+    persist_dir_path = str(persist_dir)
+    # Safely delete existing vector database to prevent duplicate vectors
+    if os.path.exists(persist_dir_path):
+        print(f"[Ingest] Cleaning existing vector database directory at '{persist_dir_path}'...")
+        shutil.rmtree(persist_dir_path)
+
     print(f"[Ingest] Initializing HuggingFace embeddings model: '{model_name}'...")
     embeddings = HuggingFaceEmbeddings(model_name=model_name)
 
@@ -61,7 +69,7 @@ def create_vector_store(
     vector_store = Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,
-        persist_directory=str(persist_dir),
+        persist_directory=persist_dir_path,
     )
 
     # Verification of persistence

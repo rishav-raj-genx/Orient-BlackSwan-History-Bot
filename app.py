@@ -1,7 +1,5 @@
 import streamlit as st
-
 from src.rag_pipeline import ask_question
-
 
 st.set_page_config(page_title="History Bot", layout="centered")
 
@@ -88,13 +86,15 @@ st.markdown(
             background: linear-gradient(90deg, var(--obs-gold), transparent);
         }
 
-        div[data-testid="stTextInput"] label p {
+        /* Standardized classes replacing brittle data-testid selectors */
+        .stTextInput label,
+        .stTextInput label p {
             color: var(--obs-maroon);
             font-size: 1rem;
             font-weight: 700;
         }
 
-        div[data-testid="stTextInput"] input {
+        .stTextInput input {
             background-color: rgba(255, 253, 246, 0.92);
             border: 1px solid #ccb982;
             border-radius: 3px;
@@ -102,7 +102,7 @@ st.markdown(
             font-family: Georgia, "Times New Roman", serif;
         }
 
-        div[data-testid="stTextInput"] input:focus {
+        .stTextInput input:focus {
             border-color: var(--obs-crimson);
             box-shadow: 0 0 0 1px var(--obs-crimson);
         }
@@ -127,7 +127,7 @@ st.markdown(
             color: #ffffff;
         }
 
-        div[data-testid="stAlert"] {
+        .stAlert {
             background-color: rgba(255, 252, 240, 0.94);
             border-left-color: var(--obs-gold);
             border-radius: 3px;
@@ -138,35 +138,40 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    """
-    <div class="catalogue-kicker">Orient BlackSwan Digital Reference Desk</div>
-    <h1 class="catalogue-title">History Bot</h1>
-    <p class="catalogue-subtitle">
-        Search the Orient BlackSwan History 2024–25 catalogue through a
-        strictly grounded research assistant.
-    </p>
-    <div class="academic-rule" aria-hidden="true">◆</div>
-    """,
-    unsafe_allow_html=True,
-)
+with st.container():
+    st.markdown(
+        """
+        <div class="catalogue-kicker">Orient BlackSwan Digital Reference Desk</div>
+        <h1 class="catalogue-title">History Bot</h1>
+        <p class="catalogue-subtitle">
+            Search the Orient BlackSwan History 2024–25 catalogue through a
+            strictly grounded research assistant.
+        </p>
+        <div class="academic-rule" aria-hidden="true">◆</div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-query: str = st.text_input(
-    "Ask the catalogue",
-    placeholder="e.g. When were the catalogue prices last updated?",
-)
+with st.container():
+    query: str = st.text_input(
+        "Ask the catalogue",
+        placeholder="e.g. When were the catalogue prices last updated?",
+    )
 
-if st.button("Search Catalogue", type="primary"):
-    if not query.strip():
-        st.warning("Enter a question before searching the catalogue.")
-    else:
-        try:
-            with st.spinner("Consulting the history catalogue..."):
-                answer: str = ask_question(query)
+    if st.button("Search Catalogue", type="primary"):
+        if not query.strip():
+            st.warning("Enter a question before searching the catalogue.")
+        else:
+            try:
+                with st.spinner("Consulting the history catalogue..."):
+                    answer: str = ask_question(query)
 
-            if answer == "Not found":
-                st.info(answer)
-            else:
-                st.success(answer)
-        except Exception as exc:
-            st.error(f"The catalogue search could not be completed: {exc}")
+                if answer == "Not found":
+                    st.info(answer)
+                else:
+                    st.success(answer)
+            except Exception:
+                st.error(
+                    "An error occurred while processing your request. "
+                    "Please verify your API key and try again."
+                )

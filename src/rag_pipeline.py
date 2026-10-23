@@ -21,7 +21,7 @@ except (ImportError, ModuleNotFoundError):
 
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -30,11 +30,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent
 CHROMA_DIR: Path = PROJECT_ROOT / "chroma_db"
 EMBEDDING_MODEL_NAME: str = "all-MiniLM-L6-v2"
-CANDIDATE_MODELS: List[str] = [
-    "gemini-1.5-flash-latest",
-    "gemini-1.5-pro",
-    "gemini-3.5-flash-lite",
-]
+MODEL_NAME: str = "gemini-3.5-flash-lite"
 
 SYSTEM_PROMPT: str = (
     "You are a strict, precise assistant tasked with answering questions based ONLY on the provided context document. Your instructions are absolute:\n"
@@ -47,19 +43,10 @@ SYSTEM_PROMPT: str = (
 )
 
 _rag_chain_instance: Optional[Runnable] = None
-_active_model_name: Optional[str] = None
 
 
-def verify_gemini_connection() -> str:
-    """Verifies that GOOGLE_API_KEY is configured and test invokes the Gemini model.
-
-    Attempts the requested Gemini 1.5 models first, then a supported flash model.
-    Returns the resolved working model name.
-    """
-    global _active_model_name
-    if _active_model_name is not None:
-        return _active_model_name
-
+def verify_gemini_connection() -> bool:
+    """Verifies that GOOGLE_API_KEY is configured and test invokes gemini-1.5-flash."""
     load_dotenv(dotenv_path=PROJECT_ROOT / ".env")
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key or api_key.strip() == "your_gemini_api_key_here":
@@ -67,28 +54,23 @@ def verify_gemini_connection() -> str:
             "GOOGLE_API_KEY is not configured or contains placeholder text in '.env'."
         )
 
-    last_error: Optional[Exception] = None
-    for model_name in CANDIDATE_MODELS:
-        try:
-            test_llm = ChatGoogleGenerativeAI(
-                model=model_name,
-                google_api_key=api_key,
-            )
-            response = test_llm.invoke("Diagnostic test: reply with 'OK'")
-            if response and response.content:
-                print(
-                    f"[Diagnostic] Google Gemini API connection verified successfully using '{model_name}'."
-                )
-                _active_model_name = model_name
-                return model_name
-        except Exception as exc:
-            last_error = exc
-            # Try next candidate if model is deprecated or not found in region/tier
-            continue
-
-    raise RuntimeError(
-        f"Google Gemini API diagnostic verification failed across candidates {CANDIDATE_MODELS}: {last_error}"
-    )
+    try:
+        test_llm = ChatGoogleGenerativeAI(
+            model=MODEL_NAME,
+            google_api_key=api_key,
+            temperature=0.0,
+        )
+        response = test_llm.invoke("Diagnostic test: reply with 'OK'")
+        if not response or not response.content:
+            raise RuntimeError("Gemini diagnostic test returned an empty response.")
+        print(
+            f"[Diagnostic] Google Gemini API connection verified successfully using '{MODEL_NAME}'."
+        )
+        return True
+    except Exception as exc:
+        raise RuntimeError(
+            f"Google Gemini API diagnostic verification failed for '{MODEL_NAME}': {exc}"
+        ) from exc
 
 
 def _format_answer_output(raw_answer: Any) -> str:
@@ -112,7 +94,7 @@ def init_rag_chain() -> Runnable:
     if _rag_chain_instance is not None:
         return _rag_chain_instance
 
-    active_model = verify_gemini_connection()
+    verify_gemini_connection()
     api_key = os.getenv("GOOGLE_API_KEY")
 
     if not CHROMA_DIR.exists():
@@ -122,7 +104,8 @@ def init_rag_chain() -> Runnable:
         )
 
     llm = ChatGoogleGenerativeAI(
-        model=active_model,
+        model=MODEL_NAME,
+        temperature=0.0,
         google_api_key=api_key,
     )
 
@@ -151,7 +134,13 @@ def ask_question(query: str) -> str:
 
     chain = init_rag_chain()
     response: Dict[str, Any] = chain.invoke({"input": query.strip()})
-    return _format_answer_output(response.get("answer", ""))
+    raw_answer = _format_answer_output(response.get("answer", ""))
+
+    # Programmatic gatekeeper: ensure exact 'Not found' whenever not found appears
+    if "not found" in raw_answer.lower():
+        return "Not found"
+
+    return raw_answer
 
 
 if __name__ == "__main__":
