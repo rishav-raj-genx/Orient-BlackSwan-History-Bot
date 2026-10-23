@@ -68,30 +68,36 @@ Streamlit will display the local application URL in the terminal, normally
 
 ### Q1: On what date were the prices in this catalogue last updated?
 
-**Answer:** 20-01-2025 (Reference: Found in the footer of the catalogue pages)
+**Answer:** The prices were last updated on 20-01-2025 (Reference: History 2025.indd 88, History 2025.indd 22, History 2025.indd 81, and History 2025.indd 40).
 
-![UI Screenshot Q1](./images/ui_q1.png)
+<img width="1470" height="801" alt="Screenshot 2026-10-23 at 4 20 11 PM" src="https://github.com/user-attachments/assets/bb536125-bc97-42e3-b665-71084384f7cc" />
+
 
 ### Q2: In which year was the publisher (Orient BlackSwan) incorporated?
 
-**Answer:** 1948 (Reference: Orient BlackSwan publisher description)
+**Answer:** Orient BlackSwan was incorporated in 1948.
 
-![UI Screenshot Q2](./images/ui_q2.png)
+Reference: Page 1 (History 2025.indd 1)
+
+<img width="1470" height="801" alt="Screenshot 2026-10-23 at 4 21 02 PM" src="https://github.com/user-attachments/assets/4be4fd40-0a6f-434d-93de-512eb7188f93" />
+
 
 ### Q3: What is the price of a Physics textbook?
 
 **Answer:** Not found
 
-![UI Screenshot Q3](./images/ui_q3.png)
+<img width="1470" height="801" alt="Screenshot 2026-10-23 at 4 22 11 PM" src="https://github.com/user-attachments/assets/26ac7c41-399e-440f-a4ef-b399dd05013f" />
+
 
 ### Q4: Who is the current Minister of Education?
 
 **Answer:** Not found
 
-![UI Screenshot Q4](./images/ui_q4.png)
+<img width="1470" height="801" alt="Screenshot 2026-10-23 at 4 23 08 PM" src="https://github.com/user-attachments/assets/86e192b0-6208-4c03-8e1f-8b6c4c782120" />
+
 
 ### Q5: Which is the "best" history book for a beginner?
 
 **Answer:** Not found
 
-![UI Screenshot Q5](./images/ui_q5.png)
+<img width="1470" height="801" alt="Screenshot 2026-10-23 at 4 24 29 PM" src="https://github.com/user-attachments/assets/7d15e85c-bac1-484a-9ba1-565427f9cd1c" />
