@@ -6,133 +6,71 @@ st.set_page_config(page_title="History Bot", layout="centered")
 st.markdown(
     """
     <style>
-        :root {
-            --obs-maroon: #6f1726;
-            --obs-crimson: #9d2338;
-            --obs-parchment: #f7f0df;
-            --obs-ink: #30251f;
-            --obs-gold: #b78a35;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
 
-        html, body, [class*="st-"] {
-            font-family: Georgia, "Times New Roman", serif;
-        }
-
+        /* Base App & Film Grain Overlay */
         .stApp {
-            background:
-                linear-gradient(rgba(247, 240, 223, 0.94), rgba(247, 240, 223, 0.94)),
-                repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 3px,
-                    rgba(111, 23, 38, 0.035) 3px,
-                    rgba(111, 23, 38, 0.035) 4px
-                );
-            color: var(--obs-ink);
+            background-color: #1a1310 !important;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            color: #E7E5E4 !important;
+            font-family: 'Manrope', sans-serif !important;
         }
 
-        .block-container {
-            max-width: 760px;
-            padding-top: 4.5rem;
+        /* Typography Overrides */
+        h1, h2, h3, p, span, div, label {
+            font-family: 'Manrope', sans-serif !important;
+            color: #E7E5E4 !important;
         }
 
-        .catalogue-kicker {
-            color: var(--obs-gold);
-            font-size: 0.82rem;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-            margin-bottom: 0.55rem;
-            text-align: center;
-            text-transform: uppercase;
+        /* Secondary/Muted Text */
+        label p, .st-emotion-cache-16idsys p {
+            color: #A8A29E !important;
         }
 
-        .catalogue-title {
-            color: var(--obs-maroon);
-            font-size: clamp(2.5rem, 7vw, 4.25rem);
-            font-weight: 700;
-            letter-spacing: -0.045em;
-            line-height: 0.96;
-            margin: 0;
-            text-align: center;
+        /* Input Fields (Card Surface) */
+        .stTextInput > div > div > input {
+            background-color: #28201E !important;
+            border: 1px solid #292524 !important;
+            color: #E7E5E4 !important;
+            border-radius: 4px !important;
         }
 
-        .catalogue-subtitle {
-            color: #66564d;
-            font-size: 1.08rem;
-            line-height: 1.65;
-            margin: 1.25rem auto 1.75rem;
-            max-width: 610px;
-            text-align: center;
-        }
-
-        .academic-rule {
-            align-items: center;
-            color: var(--obs-gold);
-            display: flex;
-            gap: 0.85rem;
-            justify-content: center;
-            margin: 0 auto 2.25rem;
-        }
-
-        .academic-rule::before,
-        .academic-rule::after {
-            background: linear-gradient(90deg, transparent, var(--obs-gold));
-            content: "";
-            height: 1px;
-            width: 110px;
-        }
-
-        .academic-rule::after {
-            background: linear-gradient(90deg, var(--obs-gold), transparent);
-        }
-
-        /* Standardized classes replacing brittle data-testid selectors */
-        .stTextInput label,
-        .stTextInput label p {
-            color: var(--obs-maroon);
-            font-size: 1rem;
-            font-weight: 700;
-        }
-
-        .stTextInput input {
-            background-color: rgba(255, 253, 246, 0.92);
-            border: 1px solid #ccb982;
-            border-radius: 3px;
-            color: var(--obs-ink);
-            font-family: Georgia, "Times New Roman", serif;
-        }
-
-        .stTextInput input:focus {
-            border-color: var(--obs-crimson);
-            box-shadow: 0 0 0 1px var(--obs-crimson);
-        }
-
+        /* Buttons (Lava Red Accent) */
         .stButton > button {
-            background: var(--obs-maroon);
-            border: 1px solid var(--obs-maroon);
-            border-radius: 3px;
-            color: #fffaf0;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 1rem;
-            font-weight: 700;
-            letter-spacing: 0.025em;
-            min-height: 3rem;
-            width: 100%;
+            background-color: #D93829 !important;
+            color: #E7E5E4 !important;
+            border: 1px solid #292524 !important;
+            border-radius: 4px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4) !important;
+            transition: all 0.2s ease-in-out !important;
         }
 
-        .stButton > button:hover,
-        .stButton > button:focus {
-            background: var(--obs-crimson);
-            border-color: var(--obs-gold);
-            color: #ffffff;
+        .stButton > button:hover {
+            background-color: #EA580C !important;
+            border-color: #F59E0B !important;
+            color: #ffffff !important;
         }
 
-        .stAlert {
-            background-color: rgba(255, 252, 240, 0.94);
-            border-left-color: var(--obs-gold);
-            border-radius: 3px;
-            color: var(--obs-ink);
+        /* Alert Boxes (Results) */
+        div[data-testid="stAlert"] {
+            background-color: #28201E !important;
+            border: 1px solid #D93829 !important;
+            border-radius: 4px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4) !important;
         }
+
+        div[data-testid="stAlert"] p,
+        div[data-testid="stAlert"] span {
+            color: #E7E5E4 !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+        }
+
+        /* Hide Streamlit Branding */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
     </style>
     """,
     unsafe_allow_html=True,
